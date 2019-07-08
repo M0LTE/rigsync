@@ -10,22 +10,12 @@ namespace SeleniumTest
         static IRigController sdrController;
         static IRigController ft818Controller;
 
-        public static void Main(string[] args)
+        public static void Main(string sdrConsolePort, string yaesuPort)
         {
-            if (args.Length != 2)
-            {
-                Console.WriteLine("Expected two args: COM port for SDR Console and COM port for Yaesu.");
-                Console.WriteLine("Example: qo100-sync COM1 COM2");
-                return;
-            }
-
-            string sdrConsoleComPort = args[0];
-            string yaesuComPort = args[1];
-
             //TODO: validate comms with the radios
 
-            sdrController = new Ts2000Controller(sdrConsoleComPort, 57600, rigPollInterval: TimeSpan.FromMilliseconds(250));
-            ft818Controller = new Ft818(yaesuComPort, 38400, rigPollInterval: TimeSpan.FromMilliseconds(50));
+            sdrController = new Ts2000Controller(sdrConsolePort, 57600, rigPollInterval: TimeSpan.FromMilliseconds(250));
+            ft818Controller = new Ft818(yaesuPort, 38400, rigPollInterval: TimeSpan.FromMilliseconds(50));
 
             sdrController.FrequencyChanged += SdrFrequencyChanged;
             ft818Controller.FrequencyChanged += Ft818_knob_twiddled;
@@ -51,22 +41,30 @@ namespace SeleniumTest
                     offset -= 100;
                     ChangeTxFreq();
                 }
+                else if (key.Key == ConsoleKey.R)
+                {
+                    PrintLayout();
+                    Redraw();
+                }
             }
         }
 
         private static void PrintLayout()
         {
-            Console.CursorVisible = false;
-            Console.SetCursorPosition(0, 0);
-            Console.Write("TX IF:");
-            Console.SetCursorPosition(0, 1);
-            Console.Write("Uplink:");
-            Console.SetCursorPosition(0, 2);
-            Console.Write("Downlink:");
-            Console.SetCursorPosition(0, 3);
-            Console.Write("Offset:");
-            Console.SetCursorPosition(0, 4);
-            Console.Write("Segment:");
+            lock (lockobj)
+            {
+                Console.CursorVisible = false;
+                Console.SetCursorPosition(0, 0);
+                Console.Write("TX IF:");
+                Console.SetCursorPosition(0, 1);
+                Console.Write("Uplink:");
+                Console.SetCursorPosition(0, 2);
+                Console.Write("Downlink:");
+                Console.SetCursorPosition(0, 3);
+                Console.Write("Offset:");
+                Console.SetCursorPosition(0, 4);
+                Console.Write("Segment:");
+            }
         }
 
         private static void ChangeTxFreq()

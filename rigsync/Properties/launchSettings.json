@@ -2,7 +2,7 @@
   "profiles": {
     "qo100-sync": {
       "commandName": "Project",
-      "commandLineArgs": "COM2 COM7"
+      "commandLineArgs": "--yaesu-port=COM2 --sdr-console-port=COM7"
     }
   }
 }
