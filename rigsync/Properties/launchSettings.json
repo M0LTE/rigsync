@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "qo100-sync": {
+      "commandName": "Project",
+      "commandLineArgs": "COM2 COM7"
+    }
+  }
+}
