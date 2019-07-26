@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SeleniumTest
 {
@@ -28,17 +29,19 @@ namespace SeleniumTest
             PrintLayout();
             Redraw();
 
+            Dictionary<ConsoleKey, int> offsets = new Dictionary<ConsoleKey, int> {
+                {ConsoleKey.PageUp, 500 },
+                {ConsoleKey.PageDown, -500 },
+                {ConsoleKey.UpArrow, 100 },
+                {ConsoleKey.DownArrow, -100 },
+            };
             while (true)
             {
                 var key = Console.ReadKey();
-                if (key.Key == ConsoleKey.UpArrow)
+
+                if (offsets.TryGetValue(key.Key, out int o))
                 {
-                    offset += 100;
-                    ChangeTxFreq();
-                }
-                else if (key.Key == ConsoleKey.DownArrow)
-                {
-                    offset -= 100;
+                    offset += o;
                     ChangeTxFreq();
                 }
                 else if (key.Key == ConsoleKey.R)

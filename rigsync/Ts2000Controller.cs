@@ -23,6 +23,7 @@ namespace SeleniumTest
             this.rigPollInterval = rigPollInterval;
 
             serialPort = new SerialPort(comPort, baudRate);
+            serialPort.ReadTimeout = 500;
             serialPort.Open();
 
             Task.Factory.StartNew(PollRig, TaskCreationOptions.LongRunning);
@@ -33,6 +34,9 @@ namespace SeleniumTest
             while (true)
             {
                 long hz = ReadFrequencyFromRig();
+
+                if (hz == 0)
+                    return;
 
                 if (freqHz != hz)
                 {
@@ -58,9 +62,19 @@ namespace SeleniumTest
 
             lock (lockObj)
             {
-                serialPort.Write("FA;");
+                while (true)
+                {
+                    serialPort.Write("FA;");
 
-                response = ReadResponse(); // FA00500000000;
+                    try
+                    {
+                        response = ReadResponse();
+                        break;
+                    }
+                    catch (TimeoutException)
+                    {
+                    }
+                }
             }
 
             if (!response.StartsWith("FA") || response.Length != 14 || !response.EndsWith(';'))
