@@ -7,6 +7,6 @@ namespace SeleniumTest
         event EventHandler<FreqEventArgs> FrequencyChanged;
 
         long GetFrequencyHz();
-        void SetFrequencyHz(long hz);
+        bool SetFrequencyHz(long hz);
     }
 }

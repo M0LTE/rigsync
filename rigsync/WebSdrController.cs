@@ -45,11 +45,13 @@ namespace SeleniumTest
             return 0;
         }
 
-        public void SetFrequencyHz(long hz)
+        public bool SetFrequencyHz(long hz)
         {
             double khz = hz / 1000.0;
 
             ((IJavaScriptExecutor)webDriver).ExecuteScript($"setfreqif('{khz}');document.freqform.frequency.value='{khz}';");
+
+            return true;
         }
 
         #region IDisposable Support

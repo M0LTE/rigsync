@@ -87,9 +87,10 @@ namespace SeleniumTest
             return this.freqHz;
         }
 
-        public void SetFrequencyHz(long hz)
+        public bool SetFrequencyHz(long hz)
         {
             this.freqHz = hz;
+            return true;
         }
 
         #region IDisposable Support

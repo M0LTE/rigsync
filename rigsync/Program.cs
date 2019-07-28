@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
 
 namespace SeleniumTest
 {
@@ -11,12 +13,25 @@ namespace SeleniumTest
         static IRigController sdrController;
         static IRigController ft818Controller;
 
-        public static void Main(string sdrConsolePort, string yaesuPort)
+        public static void Main(string sdrConsolePort)
         {
+            Console.WriteLine("Looking for Yaesu radio...");
+            var yaesuPort = Ft818.FindComPort();
+
+            if (yaesuPort.port == null)
+            {
+                Console.WriteLine("Not found, aborting.");
+                return;
+            }
+
+            Console.WriteLine($"Found at {yaesuPort.port}:{yaesuPort.baud}");
+
+            Thread.Sleep(1000);
+            Console.Clear();
             //TODO: validate comms with the radios
 
             sdrController = new Ts2000Controller(sdrConsolePort, 57600, rigPollInterval: TimeSpan.FromMilliseconds(250));
-            ft818Controller = new Ft818(yaesuPort, 38400, rigPollInterval: TimeSpan.FromMilliseconds(50));
+            ft818Controller = new Ft818(yaesuPort.port, yaesuPort.baud, rigPollInterval: TimeSpan.FromMilliseconds(50));
 
             sdrController.FrequencyChanged += SdrFrequencyChanged;
             ft818Controller.FrequencyChanged += Ft818_knob_twiddled;
@@ -30,10 +45,10 @@ namespace SeleniumTest
             Redraw();
 
             Dictionary<ConsoleKey, int> offsets = new Dictionary<ConsoleKey, int> {
-                {ConsoleKey.PageUp, 500 },
-                {ConsoleKey.PageDown, -500 },
-                {ConsoleKey.UpArrow, 100 },
-                {ConsoleKey.DownArrow, -100 },
+                {ConsoleKey.PageDown, 500 },
+                {ConsoleKey.PageUp, -500 },
+                {ConsoleKey.DownArrow, 100 },
+                {ConsoleKey.UpArrow, -100 },
             };
             while (true)
             {

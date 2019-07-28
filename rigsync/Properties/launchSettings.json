@@ -2,7 +2,7 @@
   "profiles": {
     "rigsync": {
       "commandName": "Project",
-      "commandLineArgs": "--yaesu-port=COM2 --sdr-console-port=COM7"
+      "commandLineArgs": "--sdr-console-port=COM2"
     }
   }
 }

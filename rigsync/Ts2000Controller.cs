@@ -106,7 +106,7 @@ namespace SeleniumTest
             return response;
         }
 
-        public void SetFrequencyHz(long hz)
+        public bool SetFrequencyHz(long hz)
         {
             lock (lockObj)
             {
@@ -116,7 +116,7 @@ namespace SeleniumTest
                 {
                     if (ReadFrequencyFromRig() == hz)
                     {
-                        return;
+                        return true;
                     }
                 }
             }
