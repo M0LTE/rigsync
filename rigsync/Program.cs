@@ -1,6 +1,8 @@
-﻿using System;
+﻿using NRig;
+using NRig.Rigs.Kenwood;
+using NRig.Rigs.Yaesu;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 
 namespace SeleniumTest
@@ -16,30 +18,30 @@ namespace SeleniumTest
         public static void Main(string sdrConsolePort)
         {
             Console.WriteLine("Looking for Yaesu radio...");
-            var yaesuPort = Ft818.FindComPort();
+            var (port, baud) = Ft818.FindComPort();
 
-            if (yaesuPort.port == null)
+            if (port == null)
             {
                 Console.WriteLine("Not found, aborting.");
                 return;
             }
 
-            Console.WriteLine($"Found at {yaesuPort.port}:{yaesuPort.baud}");
+            Console.WriteLine($"Found at {port}:{baud}");
 
             Thread.Sleep(1000);
             Console.Clear();
             //TODO: validate comms with the radios
 
-            sdrController = new Ts2000Controller(sdrConsolePort, 57600, rigPollInterval: TimeSpan.FromMilliseconds(250));
-            ft818Controller = new Ft818(yaesuPort.port, yaesuPort.baud, rigPollInterval: TimeSpan.FromMilliseconds(50));
+            sdrController = new Ts2000(sdrConsolePort, 57600, rigPollInterval: TimeSpan.FromMilliseconds(250));
+            ft818Controller = new Ft818(port, baud, rigPollInterval: TimeSpan.FromMilliseconds(50));
 
             sdrController.FrequencyChanged += SdrFrequencyChanged;
             ft818Controller.FrequencyChanged += Ft818_knob_twiddled;
 
             sdrFreq = 10489700000;
-            sdrController.SetFrequencyHz(sdrFreq);
+            sdrController.SetFrequency(Vfo.A, sdrFreq).Wait();
             ft818Freq = sdrFreq - offset;
-            ft818Controller.SetFrequencyHz(ft818Freq);
+            ft818Controller.SetFrequency(Vfo.A, ft818Freq).Wait();
 
             PrintLayout();
             Redraw();
@@ -87,8 +89,8 @@ namespace SeleniumTest
 
         private static void ChangeTxFreq()
         {
-            ft818Freq = sdrController.GetFrequencyHz() - offset;
-            ft818Controller.SetFrequencyHz(ft818Freq);
+            ft818Freq = sdrController.GetFrequency(Vfo.A).Result - offset;
+            ft818Controller.SetFrequency(Vfo.A, ft818Freq).Wait();
             Redraw();
         }
 
@@ -180,17 +182,17 @@ namespace SeleniumTest
             Above
         }
 
-        private static void SdrFrequencyChanged(object sender, FreqEventArgs e)
+        private static void SdrFrequencyChanged(object sender, FrequencyEventArgs e)
         {
-            sdrFreq = e.FrequencyHz;
+            sdrFreq = e.Frequency;
             ChangeTxFreq();
         }
 
-        private static void Ft818_knob_twiddled(object sender, FreqEventArgs e)
+        private static void Ft818_knob_twiddled(object sender, FrequencyEventArgs e)
         {
-            ft818Freq = e.FrequencyHz;
-            sdrFreq = e.FrequencyHz + offset;
-            sdrController.SetFrequencyHz(sdrFreq);
+            ft818Freq = e.Frequency;
+            sdrFreq = e.Frequency + offset;
+            sdrController.SetFrequency(Vfo.A, sdrFreq).Wait();
             Redraw();
         }
     }
