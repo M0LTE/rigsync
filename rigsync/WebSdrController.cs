@@ -111,6 +111,16 @@ namespace SeleniumTest
         public Task<bool> GetPreampState() => throw new NotImplementedException();
         public Task SetClarifierOffset(Frequency frequency) => throw new NotImplementedException();
         public Task<Frequency> GetClarifierOffset() => throw new NotImplementedException();
+
+        public Task BeginRigStatusUpdates(Action<RigStatus> callback, TimeSpan updateFrequency)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task EndRigStatusUpdates()
+        {
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }
